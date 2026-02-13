@@ -1,111 +1,120 @@
+# IBM watsonx Playground
 
-## 1. Setup
+# 1. Introduction
 
-### 1.1 Python Version and Virtual Environment
+This repository is a learning and development environment for building AI agents on IBM's watsonx platform. It contains reference documentation, a ready-to-run agent skeleton, and automation to get a working setup quickly.
 
-For this project we use Python version 3.12. Many IBM watsonx libraries require version 3.11 or later. To standardize the Python version across the project we use `pyenv`.
-#### 1.1.1 Linux (Ubuntu)
+## What's Inside
 
-Install build dependencies
-```bash
-sudo apt update
-sudo apt install -y build-essential curl git \
-libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev \
-wget llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev \
-libffi-dev liblzma-dev python3-openssl
-```
+### Documentation (`docs/`)
 
-Install pyenv
+- **[IBM watsonx](docs/ibm_watsonx.md)** — Deep dive into the three watsonx pillars: watsonx.ai (foundation models, Prompt Lab, Tuning Studio), watsonx.data (lakehouse, Milvus vector DB), and watsonx.governance (fairness, drift, explainability).
+- **[IBM Cloud](docs/ibm_cloud.md)** — Overview of IBM Cloud services relevant to AI agent workloads: Compute (VPC, IKS, Code Engine), Storage (COS), Networking & Security, Data & AI, and Integration.
+- **[Building AI Agents](docs/build_agents.md)** — Practical guide covering agent components (LLM, tools, RAG, memory, orchestration), architectures (ReAct, RAG agent, multi-agent, human-in-the-loop), and a step-by-step LangGraph assembly walkthrough.
+- **[Agent Tools](docs/agent_tools.md)** — How LLM tool calling works, types of tools (retrieval, database, API, code execution), building tools with LangChain's `@tool` decorator and toolkits, and the tool calling lifecycle.
+- **[Git Workflow](docs/git_workflow.md)** — Step-by-step guide to the branching model, naming conventions, PR process, and conflict resolution used in this project.
 
-```bash
-curl https://pyenv.run | bash
-```
+### Agent Skeleton (`watsonx-agent-skeletton/`)
 
-Add pyenv to the shell
-```bash
-echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
-echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
-echo 'eval "$(pyenv init --path)"' >> ~/.bashrc
-echo 'eval "$(pyenv init -)"' >> ~/.bashrc
-exec "$SHELL"
-```
+A working starter application that wires together the core technologies used throughout this project: IBM watsonx.ai for LLM inference, LangGraph for agent orchestration (might be replaced with watsonx Orchestrate), Milvus for vector search, IBM COS for document storage, and FastAPI for the web API. Its purpose is to give a quick overview of these technologies and provide a ready-made project setup to build on. See the [watsonx-agent-skeletton README](watsonx-agent-skeletton/README.md) for details.
 
-install the version
-```bash
-pyenv install 3.12.3
-```
+# 2. Setup
 
-set the python version in your project
-```bash
-cd myproject #substitute myproject with actual folder name
-pyenv local 3.12.3 # creates a .python-version file
-python --version # check --> should display Python 3.12.3
-```
+The project uses Python 3.12.3 managed through [pyenv](https://github.com/pyenv/pyenv), with all dependencies isolated in a virtual environment. The setup automation handles installing pyenv, the correct Python version, creating the venv, installing packages, and preparing the `.env` credentials file — so you can go from a fresh clone to a running project with a single command.
 
-create the virtual environment in the project, activate it and install necessary dependencies
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
+## Prerequisites
 
-If you install additional dependencies, always save them to the `requirements.txt` before you commit to the repo:
+| OS | Requirement |
+|----|-------------|
+| Ubuntu/Debian | `sudo apt install make` (usually pre-installed) |
+| macOS | `xcode-select --install` (provides `make` and `git`) |
+| Windows | PowerShell 5.1+ (pre-installed on Windows 10/11) |
+
+## Quick Start
+
+### Linux / macOS
 
 ```bash
-pip freeze > requirements.txt
+make setup
 ```
 
-#### 1.1.2 macOS
+This single command installs system dependencies, pyenv, Python 3.12.3, creates a virtual environment, installs all Python packages, and sets up your `.env` file.
 
-Install homebrew (if you don't already have it)
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+### Windows
+
+```powershell
+.\setup.ps1
 ```
 
-Add brew to the shell
-```bash
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv)"
-```
+### After Setup
 
-Install pyenv and necessary dependencies
-```bash
-brew install pyenv
-brew install openssl readline sqlite3 xz zlib tcl-tk
-```
+1. Edit `watsonx-agent-skeletton/config/.env` and fill in your IBM watsonx credentials and other environment variables.
 
-add pyenv to the shell
-```bash
-echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
-echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
-echo 'eval "$(pyenv init --path)"' >> ~/.zshrc
-echo 'eval "$(pyenv init -)"' >> ~/.zshrc
-exec "$SHELL"
-```
+## Make Targets
 
-install the version
-```bash
-pyenv install 3.12.3
-```
+| Target | Description |
+|--------|-------------|
+| `make help` | Show available targets |
+| `make setup` | One-shot full project setup |
+| `make install-deps` | Install OS-level build dependencies |
+| `make install-pyenv` | Install pyenv (skipped if already present) |
+| `make install-python` | Install Python 3.12.3 via pyenv |
+| `make venv` | Create virtual environment |
+| `make install` | Install Python dependencies into venv |
+| `make env` | Create `.env` from template |
+| `make run` | Run the watsonx agent |
+| `make clean` | Remove virtual environment |
 
-set the python version in your project
-```bash
-cd myproject #substitute myproject with actual folder name
-pyenv local 3.12.3 # creates a .python-version file
-python --version # check --> should display Python 3.12.3
-```
+## Adding Dependencies
 
-create the virtual environment in the project, activate it and install necessary dependencies
-```bash
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-```
-
-If you install additional dependencies, always save them to the `requirements.txt` before you commit to the repo:
+If you install a new package, update the requirements file:
 
 ```bash
-pip freeze > requirements.txt
+watsonx-agent-skeletton/venv/bin/pip install <package>
+watsonx-agent-skeletton/venv/bin/pip freeze > watsonx-agent-skeletton/requirements.txt
 ```
 
+<details>
+<summary><strong>Manual Setup (without Make)</strong></summary>
 
+If `make setup` did not work, follow these steps manually:
+
+1. **Install pyenv**: https://github.com/pyenv/pyenv#installation
+2. **Install Python**:
+   ```bash
+   pyenv install 3.12.3
+   pyenv local 3.12.3
+   ```
+3. **Create venv and install dependencies**:
+   ```bash
+   python -m venv watsonx-agent-skeletton/venv
+   watsonx-agent-skeletton/venv/bin/pip install -r watsonx-agent-skeletton/requirements.txt
+   ```
+4. **Set up credentials**:
+   ```bash
+   cp watsonx-agent-skeletton/config/.env.example watsonx-agent-skeletton/config/.env
+   # Edit .env and fill in your values
+   ```
+
+</details>
+
+# 3. Contributing
+
+For the full step-by-step guide with commands, see **[docs/git_workflow.md](docs/git_workflow.md)**.
+
+## Quick Rules
+
+1. **Branch from `dev`**, not `main`. Create a `feature/*` or `fix/*` branch for your work.
+2. **Never push directly to `main` or `dev`.** Always use a pull request.
+3. **Prefix your commit messages** with `feat:`, `fix:`, or `docs:`.
+4. **Open PRs into `dev`** and assign one teammate as reviewer.
+5. **Merge your own PR** after it is approved, then delete the branch.
+
+## Branch Naming
+
+| Type | Pattern | Example |
+|---|---|---|
+| New feature | `feature/<short-description>` | `feature/add-auth` |
+| Bug fix | `fix/<short-description>` | `fix/config-validation` |
+
+Lowercase, hyphens between words, 2-4 words.

@@ -1,2 +1,7 @@
 venv
 .env
+__pycache__/
+*.pyc
+CLAUDE.md
+.claude
+watsonx_agent.db
